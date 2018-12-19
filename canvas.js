@@ -40,10 +40,10 @@ var mousePos = {
     y: undefined
 }
 var collapseCircleArea = {
-    top: 100,
-    bottom: 100,
-    left: 150,
-    right: 150
+    top: 50,
+    bottom: 50,
+    left: 50,
+    right: 50 
 }
 
 window.addEventListener('mousemove', function(event) {
@@ -62,12 +62,7 @@ function AnimatedText (x, y, text, font, fillStyle) {
         c.fillStyle = this.fillStyle;
 
         c.font = this.font;
-        c.strokeStyle = "black";
 
-        c.miterLimit = 2;
-        c.lineJoin = 'circle';
-        c.lineWidth = 2;
-        c.strokeText(this.text, this.x, this.y);
         c.lineWidth = 1;
         c.fillText(this.text, this.x, this.y);
     }
