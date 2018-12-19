@@ -5,8 +5,32 @@ canvas.height = window.innerHeight;
 
 var c = canvas.getContext('2d');
 
-var okHandImg = document.createElement("img");
-okHandImg.setAttribute('src', 'https://png.pngtree.com/element_origin_min_pic/16/11/22/d8867a7e330ad30040da1ae2550282f9.jpg');
+var backgroundImg = document.createElement("img");
+
+var imageArray = [
+    "https://i.redd.it/1iwcit1gidyy.jpg", // Vaporwave
+    "https://wallpaperaccess.com/full/119615.jpg", // Beach
+    "https://i.imgur.com/let82Vr.jpg", // Space
+    "https://www.hdwallpapers.in/download/military_soldiers_4k-wide.jpg", // Soldiers
+    "https://i.pinimg.com/originals/fb/19/87/fb198758d12be1f7cb70ef3164673683.jpg", // City
+    "https://d2v9y0dukr6mq2.cloudfront.net/video/thumbnail/f47HLdl/4k-timelapse-of-active-fuego-volcano-in-guatemala-at-sunrise_he11kebv__F0000.png" // Sky
+];
+
+var themeNumber = Math.floor(Math.random() * imageArray.length);
+
+var masterColorArray = [
+    ["#2D796A", "#022F2E", "#E211E5", "#011353"], // Vaporwave
+    ["#0A699E", "#E6C37C", "#DEE7F6", "#283519"], // Beach
+    ["#BFFAFE", "#13212E", "#58AAE2", "	#1C414A"], // Space
+    ["#FFC141", "#441E00", "#A05D04", "##AA740C"], // Soldiers
+    ["#FF882F", "#0A3F54", "#A9ADA8", "#3E3F40"], // City
+    ["#FFD1B9", "#6B3F45", "#FFF4D0", "#39476C"], // Sky
+];
+
+backgroundImg.setAttribute('src', imageArray[themeNumber]);
+
+var colorArray = masterColorArray[themeNumber];
+
 var score = 0;
 
 var maxRadius = 50;
@@ -22,26 +46,29 @@ var collapseCircleArea = {
     right: 150
 }
 
-var colorArray = [
-    "#e48d2c",
-    "#b96332",
-    "#f3e056",
-    "#5f5e5c"
-];
-
 window.addEventListener('mousemove', function(event) {
     mousePos.x = event.x;
     mousePos.y = event.y;
 });
 
-function AnimatedText (x, y, text, font) {
+function AnimatedText (x, y, text, font, fillStyle) {
     this.x = x;
     this.y = y;
     this.text = text;
     this.font = font;
+    this.fillStyle = fillStyle;
 
     this.draw = function () {
+        c.fillStyle = this.fillStyle;
+
         c.font = this.font;
+        c.strokeStyle = "black";
+
+        c.miterLimit = 2;
+        c.lineJoin = 'circle';
+        c.lineWidth = 2;
+        c.strokeText(this.text, this.x, this.y);
+        c.lineWidth = 1;
         c.fillText(this.text, this.x, this.y);
     }
 
@@ -50,9 +77,9 @@ function AnimatedText (x, y, text, font) {
     }
 }
 
-var lblScore = new AnimatedText(50, 50, "Score: 0", "50px Arial");
+var lblScore = new AnimatedText(50, 50, "Score: 0", "50px Arial", colorArray[2]);
 
-var circleArray = [];
+var circleArray = new Array();
 for (var i = 0; i < 500; i++) {
     var x = Math.random() * (innerWidth - radius * 2) + radius;
     var y = Math.random() * (innerHeight - radius * 2)+ radius;
@@ -87,8 +114,14 @@ function AnimatedCircle (x, y, radius, strokeStyle, dx, dy, colSpeed, exSpeed) {
     }
 
     this.remove = function () {
-        var i = circleArray.indexOf(this);
-        circleArray.splice(i, 1);
+        var newCircleArray = Array();
+        for (var i = 0; i < circleArray.length; i++) {
+            if (circleArray[i] != this) {
+                newCircleArray.push(circleArray[i])
+            }
+        }
+
+        circleArray = newCircleArray;
     }
 
     this.update = function () {
@@ -121,8 +154,8 @@ function AnimatedCircle (x, y, radius, strokeStyle, dx, dy, colSpeed, exSpeed) {
          && this.radius <= minRadius) {
             this.colSpeed = -this.colSpeed;
             this.exSpeed = -this.exSpeed;
-             score += (this.colSpeed - this.exSpeed);
-             lblScore.editText("Score: " + Math.abs(score).toString());
+            score += 1;
+             lblScore.editText("Score: " + score.toString());
              this.remove();
         }
 
@@ -135,13 +168,12 @@ function animate () {
     c.clearRect(0, 0, innerWidth, innerHeight); // Clear the canvas
     
 
-    c.drawImage(okHandImg, (innerWidth / 2) - (okHandImg.width / 2), 
-                innerHeight - okHandImg.height);
-
+    c.drawImage(backgroundImg, 0, 0, backgroundImg.width, backgroundImg.height,
+                               0, 0, canvas.width, canvas.height);
     circleArray.forEach(function(circle) {
         circle.update();
     });
-
+    
     lblScore.draw();
 }
 
